@@ -134,6 +134,22 @@ void read_fsensor(const std::string & name,
   }
 }
 
+void read_extrasensor(const std::string & name,
+                  RTC::InPort<RTC::TimedDoubleSeq> & port,
+                  RTC::TimedDoubleSeq & data,
+                  mc_udp::Server & server_)
+{
+  if(port.isNew())
+  {
+    port.read();
+    if(data.data.length() == 6)
+    {
+      server_.sensors().extrasensor(name, data.data.NP_data());
+    }
+  }
+}
+
+
 } // namespace
 
 RTC::ReturnCode_t MCUDPSensors::onExecute(RTC::UniqueId ec_id)
@@ -142,7 +158,7 @@ RTC::ReturnCode_t MCUDPSensors::onExecute(RTC::UniqueId ec_id)
   read_fsensor("lfsensor", lfsensorIn, lfsensor, server_);
   read_fsensor("rhsensor", rhsensorIn, rhsensor, server_);
   read_fsensor("lhsensor", lhsensorIn, lhsensor, server_);
-  read_fsensor("extrasensor", extrasensorIn, extrasensor, server_);
+  read_extrasensor("extrasensor", extrasensorIn, extrasensor, server_);
   if(m_rpyInIn.isNew())
   {
     m_rpyInIn.read();

@@ -46,9 +46,14 @@ struct RobotSensors
   double floatingBaseVel[6];
   /** Acceleration of floating base (angular-linear) **/
   double floatingBaseAcc[6];
+  /** Extra force sensor readings */
+  std::vector<ForceSensor> extrasensors;
 
   /** Add a force sensor reading */
   void fsensor(const std::string & name, double data[6]);
+
+  /** Add extra sensor reading */
+  void extrasensor(const std::string & name, double data[6]);
 
   /** Compute required buffer size */
   size_t size() const;
@@ -58,8 +63,8 @@ struct RobotSensors
   void fromBuffer(uint8_t * buffer);
 
 private:
-  /** Size of required buffer size for force sensors */
-  size_t fsensorsSize() const;
+  /** Size of required buffer size for a force sensor vector */
+  size_t fsensorsSize(const std::vector<ForceSensor> & sensors) const;
 };
 
 } // namespace mc_udp

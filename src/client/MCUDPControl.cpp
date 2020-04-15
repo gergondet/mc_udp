@@ -308,20 +308,21 @@ int main(int argc, char * argv[])
       {
         Eigen::Vector6d reading;
         reading << fs.reading[3], fs.reading[4], fs.reading[5], fs.reading[0], fs.reading[1], fs.reading[2];
-        if(fs.name == "extrasensor")
-        {
-          auto & datastore = controller.controller().datastore();
-          if(!datastore.has(extra))
-          {
-            datastore.make<sva::ForceVecd>(extra, reading);
-          }
-          else
-          {
-            datastore.assign(extra, sva::ForceVecd(reading));
-          }
-          continue;
-        }
         wrenches[fsensors.at(fs.name)] = sva::ForceVecd(reading);
+      }
+      for(const auto & fs : sc.extrasensors)
+      {
+        Eigen::Vector6d reading;
+        reading << fs.reading[3], fs.reading[4], fs.reading[5], fs.reading[0], fs.reading[1], fs.reading[2];
+        auto & datastore = controller.controller().datastore();
+        if(!datastore.has(extra))
+        {
+          datastore.make<sva::ForceVecd>(extra, reading);
+        }
+        else
+        {
+          datastore.assign(extra, sva::ForceVecd(reading));
+        }
       }
       controller.setWrenches(wrenches);
       updateGripperState(sensorsClient.sensors().encoders);
