@@ -13,6 +13,8 @@ namespace po = boost::program_options;
 
 static bool running = true;
 
+static const std::string extra = "Choreonoid::ExtraSensor";
+
 void handler(int)
 {
   running = false;
@@ -306,6 +308,19 @@ int main(int argc, char * argv[])
       {
         Eigen::Vector6d reading;
         reading << fs.reading[3], fs.reading[4], fs.reading[5], fs.reading[0], fs.reading[1], fs.reading[2];
+        if(fs.name == "extrasensor")
+        {
+          auto & datastore = controller.controller().datastore();
+          if(!datastore.has(extra))
+          {
+            datastore.make<sva::ForceVecd>(extra, reading);
+          }
+          else
+          {
+            datastore.assign(extra, sva::ForceVecd(reading));
+          }
+          continue;
+        }
         wrenches[fsensors.at(fs.name)] = sva::ForceVecd(reading);
       }
       controller.setWrenches(wrenches);
@@ -314,6 +329,10 @@ int main(int argc, char * argv[])
       if(!init)
       {
         auto init_start = clock::now();
+        if(!controller.controller().datastore().has(extra))
+        {
+          controller.controller().datastore().make<sva::ForceVecd>(extra, sva::ForceVecd::Zero());
+        }
         controller.init(qIn);
         controller.setGripperCurrentQ(gripperState);
         for(const auto & g : gripperState)

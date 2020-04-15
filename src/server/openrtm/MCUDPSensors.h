@@ -72,6 +72,8 @@ protected:
   RTC::InPort<RTC::TimedDoubleSeq> rhsensorIn;
   RTC::TimedDoubleSeq lhsensor;
   RTC::InPort<RTC::TimedDoubleSeq> lhsensorIn;
+  RTC::TimedDoubleSeq extrasensor;
+  RTC::InPort<RTC::TimedDoubleSeq> extrasensorIn;
 
 private:
   /* Measure execution time */

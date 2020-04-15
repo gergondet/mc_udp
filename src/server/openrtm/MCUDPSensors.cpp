@@ -57,6 +57,7 @@ MCUDPSensors::MCUDPSensors(RTC::Manager* manager)
     lfsensorIn("lfsensor", lfsensor),
     rhsensorIn("rhsensor", rhsensor),
     lhsensorIn("lhsensor", lhsensor),
+    extrasensorIn("extrasensor", extrasensor),
     m_pInIn("pIn", m_pIn),
     m_basePoseInIn("basePoseIn", m_basePoseIn),
     m_baseVelInIn("baseVelIn", m_baseVelIn),
@@ -82,6 +83,7 @@ RTC::ReturnCode_t MCUDPSensors::onInitialize()
   addInPort("lfsensor", lfsensorIn);
   addInPort("rhsensor", rhsensorIn);
   addInPort("lhsensor", lhsensorIn);
+  addInPort("extrasensor", extrasensorIn);
   addInPort("pIn", m_pInIn);
   // Floating base
   addInPort("basePoseIn", m_basePoseInIn);
@@ -140,6 +142,7 @@ RTC::ReturnCode_t MCUDPSensors::onExecute(RTC::UniqueId ec_id)
   read_fsensor("lfsensor", lfsensorIn, lfsensor, server_);
   read_fsensor("rhsensor", rhsensorIn, rhsensor, server_);
   read_fsensor("lhsensor", lhsensorIn, lhsensor, server_);
+  read_fsensor("extrasensor", extrasensorIn, extrasensor, server_);
   if(m_rpyInIn.isNew())
   {
     m_rpyInIn.read();
