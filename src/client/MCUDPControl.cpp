@@ -154,17 +154,6 @@ int main(int argc, char * argv[])
   fsensors["rhsensor"] = "RightHandForceSensor";
   fsensors["lhsensor"] = "LeftHandForceSensor";
   std::map<std::string, std::map<std::string, sva::ForceVecd>> robot_wrenches;
-  auto refIndex = [&controller](const std::string & jName) {
-    const auto & rjo = controller.robot().refJointOrder();
-    for(size_t i = 0; i < rjo.size(); ++i)
-    {
-      if(rjo[i] == jName)
-      {
-        return static_cast<int>(i);
-      }
-    }
-    return -1;
-  };
   std::map<size_t, double> ignoredJoints;
   std::map<size_t, double> ignoredVelocities;
   if(config.has("IgnoredJoints"))
@@ -178,7 +167,7 @@ int main(int argc, char * argv[])
     {
       if(controller.robot().hasJoint(jN))
       {
-        const auto & rjo = controller.robot().refJointOrder();
+        const auto & rjo = controller.robot().module().ref_joint_order();
         const auto idx = std::distance(rjo.begin(), std::find(rjo.begin(), rjo.end(), jN));
         double qInit = 0;
         double alphaInit = 0;
@@ -190,7 +179,7 @@ int main(int argc, char * argv[])
         else
         {
           // Use halfsitting configuration
-          qInit = controller.robot().stance().at(jN)[0];
+          qInit = controller.robot().module().stance().at(jN)[0];
         }
         ignoredJoints[idx] = qInit;
 
@@ -339,8 +328,9 @@ int main(int argc, char * argv[])
         init = true;
         auto init_end = clock::now();
         duration_ms init_dt = init_end - init_start;
-        for(const auto & robot : controller.controller().robots())
+        for(const auto & robot_p : controller.controller().robots())
         {
+          const auto & robot = *robot_p;
           const auto & rjo = robot.module().ref_joint_order();
           if(rjo.size() == 0)
           {
@@ -374,9 +364,10 @@ int main(int argc, char * argv[])
         }
         if(controller.run())
         {
-          for(const auto & robot : controller.controller().robots())
+          for(const auto & robot_p : controller.controller().robots())
           {
-            const auto & rjo = robot.refJointOrder();
+            const auto & robot = *robot_p;
+            const auto & rjo = controller.robot().module().ref_joint_order();
             if(rjo.size() == 0)
             {
               continue;
